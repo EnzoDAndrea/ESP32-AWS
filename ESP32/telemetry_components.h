@@ -66,7 +66,7 @@ void OpenWeather(String& openweather) {
 
   //create an HTTPClient instance
   HTTPClient https;
-  String url = String("https://") + String(host) + "/data/2.5/weather?lat=45.5131&lon=9.237977&appid=" + String(OPEN_WEATHER_MAP_API_KEY);
+  String url = String("https://") + String(host) + "/data/2.5/weather?lat=45.70&lon=9.30&appid=" + String(OPEN_WEATHER_MAP_API_KEY);
   if (WiFi.status() == WL_CONNECTED) {
     if (https.begin(*client, url)) {
       int httpCode = https.GET();
