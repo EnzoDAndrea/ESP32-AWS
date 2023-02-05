@@ -1,4 +1,4 @@
-# ESP32-AW: Read data from different sensor and store them in Amazon Web Service IoT
+# ESP32-AW: Read data from different sensor and store them in Amazon Web Service IoT (Arduino Sketch)
 ***
 Board Manager Libraries:
 1. ESP32 by Espressif Systems
