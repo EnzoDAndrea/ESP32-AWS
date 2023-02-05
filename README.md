@@ -11,3 +11,11 @@ Required Libraries:
 
 ## Wiring schema
 ![image description](Wiring/Weather_station_wiring.png)
+
+## File to be modified
+
+ESP32-AWS/ESP32/secrets.h
+
+### FILL YOUR SSID and PASSWORD
+const char WIFI_SSID[] = "[YOUR SSIS]";
+const char WIFI_PASSWORD[] = "[YOUR PASSWORD]"; 
