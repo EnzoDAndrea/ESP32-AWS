@@ -31,3 +31,6 @@ const char MQTT_HOST[] = "[YOUR AWS MQTT]";
 5. Download your device certificate, open it in read mode and replace the section between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE----- (static const char client_cert[])
 
 6. Download your device private key, open it in read mode and replace the section between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE----- (static const char privkey[])
+
+7. Replace this section with your registred API KEY from https://openweathermap.org/
+const char OPEN_WEATHER_MAP_API_KEY[] = "[YOUR API KEY]"; 
