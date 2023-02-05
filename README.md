@@ -2,4 +2,6 @@
 ***
 Board Manager Libraries:
 1. ESP32 by Espressif Systems
+
+Required Libraries:
 2. "MQTT by Joel Gaehwiler"
