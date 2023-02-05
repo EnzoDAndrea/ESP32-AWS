@@ -18,4 +18,10 @@ ESP32-AWS/ESP32/secrets.h
 
 ### FILL YOUR SSID and PASSWORD
 const char WIFI_SSID[] = "[YOUR SSIS]";
-const char WIFI_PASSWORD[] = "[YOUR PASSWORD]"; 
+const char WIFI_PASSWORD[] = "[YOUR PASSWORD]";
+
+### FILL THE NAME of YOUR DEVICE
+#define THINGNAME "[YOUR THINGNAME]" 
+
+### FILL AWS ENDPOINT
+const char MQTT_HOST[] = "[YOUR AWS MQTT]";
