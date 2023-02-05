@@ -16,31 +16,31 @@ Required Libraries:
 
 ESP32-AWS/ESP32/secrets.h
 
-### FILL YOUR SSID and PASSWORD
+1. FILL YOUR SSID and PASSWORD
 const char WIFI_SSID[] = "[YOUR SSIS]";
 const char WIFI_PASSWORD[] = "[YOUR PASSWORD]";
 
-### FILL THE NAME of YOUR DEVICE
+2. FILL THE NAME of YOUR DEVICE
 #define THINGNAME "[YOUR THINGNAME]" 
 
-### FILL AWS ENDPOINT
+3. FILL AWS ENDPOINT
 const char MQTT_HOST[] = "[YOUR AWS MQTT]";
 
 
-#### Download your root certificate, open it in read mode and replace the section between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----
+4. Download your root certificate, open it in read mode and replace the section between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----
 
 static const char cacert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 -----END CERTIFICATE-----
 )EOF";
 
-#### Download your device certificate, open it in read mode and replace the section between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----
+5. Download your device certificate, open it in read mode and replace the section between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----
 static const char client_cert[] PROGMEM = R"KEY(
 -----BEGIN CERTIFICATE-----
 -----END CERTIFICATE-----
 )KEY";
 
-#### Download your device private key, open it in read mode and replace the section between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----
+6. Download your device private key, open it in read mode and replace the section between -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----
 static const char privkey[] PROGMEM = R"KEY(
 -----BEGIN RSA PRIVATE KEY-----
 -----END RSA PRIVATE KEY----- 
