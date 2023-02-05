@@ -12,7 +12,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-#define dataPin 17
+#define dataPin 4
 #define DHTType DHT22
 
 DHT dht = DHT(dataPin, DHTType);
