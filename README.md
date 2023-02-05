@@ -58,4 +58,6 @@ static const char privkey[] PROGMEM = R"KEY(
 
 
 7. Replace this section with your registred API KEY from https://openweathermap.org/
+```c++
 const char OPEN_WEATHER_MAP_API_KEY[] = "[YOUR API KEY]"; 
+```
