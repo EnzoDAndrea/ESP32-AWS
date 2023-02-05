@@ -1,5 +1,5 @@
 # ESP32-AW: Read data from different sensor and store them in Amazon Web Service IoT
-"# ESP32-AWS" 
-"# ESP32-AWS" 
-"# ESP32-AWS" 
-"MQTT by Joel Gaehwiler"
+***
+Board Manager Libraries:
+1. ESP32 by Espressif Systems
+2. "MQTT by Joel Gaehwiler"
