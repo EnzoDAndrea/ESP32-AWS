@@ -6,3 +6,5 @@ Board Manager Libraries:
 Required Libraries:
 1. MQTT by Joel Gaehwiler
 2. ArduinoJson by Benoit Blanchon
+3. DHT sensor library by Adafruit
+4. Adafruit BMP280 Library by Adafruit
