@@ -8,3 +8,6 @@ Required Libraries:
 2. ArduinoJson by Benoit Blanchon
 3. DHT sensor library by Adafruit
 4. Adafruit BMP280 Library by Adafruit
+
+## Wiring schema
+![image description](Wiring/Weather_station_wiring.png)
