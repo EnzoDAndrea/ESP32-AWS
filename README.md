@@ -5,3 +5,4 @@ Board Manager Libraries:
 
 Required Libraries:
 1. MQTT by Joel Gaehwiler
+2. ArduinoJson by Benoit Blanchon
