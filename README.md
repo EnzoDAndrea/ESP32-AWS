@@ -59,3 +59,9 @@ static const char privkey[] PROGMEM = R"KEY(
 ```c++
 const char OPEN_WEATHER_MAP_API_KEY[] = "[YOUR API KEY]"; 
 ```
+
+## Example of telemetry payload
+
+```json
+{"time":1675957668,"city":"Milan","latitude":45.22,"longitude":9.22,"humidity":28.89999962,"temp":24.04000092,"pressure":101844.1406,"lux":11.66666603,"weathercode":800,"weatherdescr":"clear sky"}
+```
