@@ -10,9 +10,6 @@ Required Libraries:
 4. Adafruit BMP280 Library by Adafruit
 5. BH1750 library by Christopher Laws
 
-## Wiring schema
-![image description](Wiring/Weather_station_wiring.png)
-
 ## File to be modified
 
 ESP32-AWS/ESP32/secrets.h
