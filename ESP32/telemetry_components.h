@@ -1,10 +1,11 @@
 #pragma once
 #include <DHT.h>
 #include "time.h"
-
+#include <i2cdetect.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_BMP280.h>
+#include <BH1750.h>
 #include <ArduinoJson.h>
 #include <WiFiClientSecure.h>
 
@@ -12,7 +13,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-#define dataPin 4
+#define dataPin 27
 #define DHTType DHT22
 
 DHT dht = DHT(dataPin, DHTType);
@@ -25,8 +26,12 @@ DHT dht = DHT(dataPin, DHTType);
 #define BMP_SDA 21
 #define BMP_SCL 22
 
-Adafruit_BMP280 bmp; // I2C
+#define LATITUDE 45.51
+#define LONGITUDE 9.23
 
+Adafruit_BMP280 bmp; // I2C
+#define BH1750_ADDRESS 0x23
+BH1750 bh1750;
 
 static const char rootCAOpenWeatherkey[] PROGMEM = R"KEY(
 -----BEGIN CERTIFICATE-----
@@ -66,11 +71,14 @@ void OpenWeather(String& openweather) {
 
   //create an HTTPClient instance
   HTTPClient https;
-  String url = String("https://") + String(host) + "/data/2.5/weather?lat=45.70&lon=9.30&appid=" + String(OPEN_WEATHER_MAP_API_KEY);
+  String url = String("https://") + String(host) + "/data/2.5/weather?lat=" + String(LATITUDE) + "&lon=" + String(LONGITUDE) + "&appid=" + String(OPEN_WEATHER_MAP_API_KEY);
+  Serial.println(url);
   if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("Connected WiFi x OpenWeatherAPI!");
     if (https.begin(*client, url)) {
       int httpCode = https.GET();
       if (httpCode > 0) {
+        Serial.println("HTTP " + String(httpCode) + " on OpenWeatherAPI " );
         // HTTP header has been send and Server response header has been handled
         // file found at server
         if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
@@ -80,7 +88,7 @@ void OpenWeather(String& openweather) {
         }
       }
       else {
-        Serial.printf("[HTTPS] GET> api.openweathermap.org ... failed, error: %s\n", https.errorToString(httpCode).c_str());
+        Serial.println("[HTTPS] GET> api.openweathermap.org ... failed, error");
       }
       https.end();
     }
@@ -91,6 +99,7 @@ void OpenWeather(String& openweather) {
 void SetWeatherCondition(int& weatherId, String& weatherDescription) {
     String currentWeather;
     OpenWeather(currentWeather);
+    Serial.println(currentWeather);
     StaticJsonDocument<200> filter;
 
     StaticJsonDocument<256> docOpenWeather;
@@ -102,7 +111,12 @@ void SetWeatherCondition(int& weatherId, String& weatherDescription) {
 
 void SetupTelemetry() {
   Serial.begin(115200);
+  Wire.begin();
+  i2cdetect();
+
   dht.begin();
+
+  bh1750.begin();
 
   unsigned status;
   status = bmp.begin(0x76);
@@ -134,17 +148,24 @@ unsigned long getTime() {
 
 String GetTelemetry() {
   String telemetry = "";
-  delay(10000);
   // humidity from dht22
   float h = dht.readHumidity();
-
+  Serial.println("Humidity sensors:");
+  Serial.println(h);
   // temperature from mbp208
   float t = bmp.readTemperature();
-
+  Serial.println("Temperature sensors:");
+  Serial.println(t);
   // pressure from mbp208
   float p = bmp.readPressure();
+  Serial.println("Pressure sensors:");
+  Serial.println(p);
 
-  if (isnan(h) || isnan(t) || isnan(p)) {
+  float l = bh1750.readLightLevel();
+  Serial.print("Light sensors: ");
+  Serial.print(l);
+
+  if (isnan(h) || isnan(t) || isnan(p) || isnan(l)) {
       Serial.println("Error sensors.");
       Serial.println("Please check wiring configuration.");
       return "";
@@ -162,12 +183,13 @@ String GetTelemetry() {
 
     doc["time"] = epochTime;
     doc["city"] = "Milan";
-    doc["latitude"] = 45.60;
-    doc["longitude"] = 9.30;
+    doc["latitude"] = LATITUDE;
+    doc["longitude"] = LONGITUDE;
 
     doc["humidity"] = h;
     doc["temp"] = t;
     doc["pressure"] = p;
+    doc["lux"] = l;
     doc["weathercode"] = weatherId;
     doc["weatherdescr"] = weatherDescription;
 
