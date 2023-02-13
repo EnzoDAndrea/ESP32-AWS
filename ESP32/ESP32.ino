@@ -6,13 +6,14 @@
 #include <MQTTClient.h>
 #include <ArduinoJson.h>
 
+#define SLEEP_FACTOR 900000000
+RTC_DATA_ATTR int bootCount = 0;
 
-
-#define AWS_IOT_PUBLISH_TOPIC   "esp32/pub"
-#define AWS_IOT_SUBSCRIBE_TOPIC "esp32/sub"
+#define AWS_IOT_PUBLISH_TOPIC   "device/0/data"
+#define AWS_IOT_SUBSCRIBE_TOPIC "device/0/sub"
  
 WiFiClientSecure net;
-MQTTClient client = MQTTClient(256);
+MQTTClient client = MQTTClient(1024);
 
 
 time_t now;
@@ -38,6 +39,22 @@ void NTPConnect(void)
   gmtime_r(&now, &timeinfo);
   Serial.print("Current time: ");
   Serial.print(asctime(&timeinfo));
+}
+
+void print_wakeup_reason(){
+  esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch(wakeup_reason)
+  {
+    case ESP_SLEEP_WAKEUP_EXT0 : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
+    case ESP_SLEEP_WAKEUP_EXT1 : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+    case ESP_SLEEP_WAKEUP_TIMER : Serial.println("Wakeup caused by timer"); break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD : Serial.println("Wakeup caused by touchpad"); break;
+    case ESP_SLEEP_WAKEUP_ULP : Serial.println("Wakeup caused by ULP program"); break;
+    default : Serial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
+  }
 }
 
 void messageHandler(String &topic, String &payload) {
@@ -92,18 +109,43 @@ void publishMessage()
 {
   char jsonBuffer[1024];
   String telemetry = GetTelemetry();
-
+  Serial.println("Telemetry to be published:");
+  Serial.println(telemetry);
   int str_len = telemetry.length() + 1; 
   // Copy it over 
   telemetry.toCharArray(jsonBuffer, str_len);
+  Serial.println("Telemetry to be sent:");
+  Serial.println(jsonBuffer);
+
+  if(jsonBuffer == NULL){
+    Serial.println("No telemetry data");
+    return;      
+  }
+
+  String isEmptyTelemtryValue = String(jsonBuffer);
+  isEmptyTelemtryValue.trim();
+  if (isEmptyTelemtryValue.isEmpty()) {
+    Serial.println("Telemetry data is empty");
+    return;
+  }
 
   client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);
+  Serial.println("Published Telemetry:");
+  Serial.println(jsonBuffer);
 }
 
 void setup() {
   Serial.begin(115200);
   
-  delay(60000);
+  delay(1000);
+
+  ++bootCount;
+  Serial.println("Boot number: " + String(bootCount));
+  
+  print_wakeup_reason();
+  
+  esp_sleep_enable_timer_wakeup(SLEEP_FACTOR);
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.println();
@@ -122,7 +164,7 @@ void setup() {
 }
 
 void loop() {
-  delay(10000);
+  delay(1000);
   if (!client.connected())
   {
     connectAWS();
@@ -130,10 +172,8 @@ void loop() {
   else
   {
     client.loop();
-    if (millis() - lastMillis > 5000)
-    {
-      lastMillis = millis();
-      publishMessage();
-    }
+    Serial.println("Publishing in AWS!");
+    publishMessage();
+    esp_deep_sleep_start();
   }
 }

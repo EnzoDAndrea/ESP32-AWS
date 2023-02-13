@@ -96,7 +96,7 @@ void OpenWeather(String& openweather) {
   client->stop();
 }
 
-void SetWeatherCondition(int& weatherId, String& weatherDescription) {
+void SetWeatherCondition(int& weatherId, String& weatherDescription, double& speed, double& deg) {
     String currentWeather;
     OpenWeather(currentWeather);
     Serial.println(currentWeather);
@@ -104,9 +104,12 @@ void SetWeatherCondition(int& weatherId, String& weatherDescription) {
 
     StaticJsonDocument<256> docOpenWeather;
     filter["weather"] = true;
+    filter["wind"] = true;
     deserializeJson(docOpenWeather, currentWeather, DeserializationOption::Filter(filter));
     weatherId = docOpenWeather["weather"][0]["id"].as<int>();
     weatherDescription = docOpenWeather["weather"][0]["description"].as<String>();
+    speed = docOpenWeather["wind"]["speed"].as<double>();
+    deg = docOpenWeather["wind"]["deg"].as<double>();
 }
 
 void SetupTelemetry() {
@@ -162,8 +165,8 @@ String GetTelemetry() {
   Serial.println(p);
 
   float l = bh1750.readLightLevel();
-  Serial.print("Light sensors: ");
-  Serial.print(l);
+  Serial.println("Light sensors: ");
+  Serial.println(l);
 
   if (isnan(h) || isnan(t) || isnan(p) || isnan(l)) {
       Serial.println("Error sensors.");
@@ -174,7 +177,10 @@ String GetTelemetry() {
   int weatherId = 0;
   String weatherDescription = "";
 
-  SetWeatherCondition(weatherId, weatherDescription);
+  double speed = 0.0;
+  double deg = 0.0;
+
+  SetWeatherCondition(weatherId, weatherDescription, speed, deg);
   if (weatherId > 0) {
     StaticJsonDocument<256> doc;
     // Variable to save current epoch time
@@ -185,6 +191,9 @@ String GetTelemetry() {
     doc["city"] = "Milan";
     doc["latitude"] = LATITUDE;
     doc["longitude"] = LONGITUDE;
+
+    doc["speed"] = speed;
+    doc["deg"] = deg;
 
     doc["humidity"] = h;
     doc["temp"] = t;
