@@ -184,9 +184,9 @@ String GetTelemetry() {
 
   double speed = 0.0;
   double deg = 0.0;
-  double temperatureow;
-  double pressureow; 
-  double humidityow;
+  double temperatureow = 0.0;
+  double pressureow = 0.0;
+  double humidityow = 0.0;
 
   SetWeatherCondition(weatherId, weatherDescription, speed, deg, temperatureow, pressureow, humidityow);
   if (weatherId > 0) {
