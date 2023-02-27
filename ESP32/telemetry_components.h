@@ -8,6 +8,7 @@
 #include <BH1750.h>
 #include <ArduinoJson.h>
 #include <WiFiClientSecure.h>
+#include "secrets.h"
 
 #include <esp_now.h>
 #include <WiFi.h>
@@ -96,7 +97,7 @@ void OpenWeather(String& openweather) {
   client->stop();
 }
 
-void SetWeatherCondition(int& weatherId, String& weatherDescription, double& speed, double& deg) {
+void SetWeatherCondition(int& weatherId, String& weatherDescription, double& speed, double& deg, double& temperatureow, double& pressureow, double& humidityow) {
     String currentWeather;
     OpenWeather(currentWeather);
     Serial.println(currentWeather);
@@ -105,11 +106,15 @@ void SetWeatherCondition(int& weatherId, String& weatherDescription, double& spe
     StaticJsonDocument<256> docOpenWeather;
     filter["weather"] = true;
     filter["wind"] = true;
+    filter["main"] = true;
     deserializeJson(docOpenWeather, currentWeather, DeserializationOption::Filter(filter));
     weatherId = docOpenWeather["weather"][0]["id"].as<int>();
     weatherDescription = docOpenWeather["weather"][0]["description"].as<String>();
     speed = docOpenWeather["wind"]["speed"].as<double>();
     deg = docOpenWeather["wind"]["deg"].as<double>();
+    temperatureow = docOpenWeather["main"]["temp"].as<double>();
+    pressureow = docOpenWeather["main"]["pressure"].as<double>();
+    humidityow = docOpenWeather["main"]["humidity"].as<double>();
 }
 
 void SetupTelemetry() {
@@ -179,8 +184,11 @@ String GetTelemetry() {
 
   double speed = 0.0;
   double deg = 0.0;
+  double temperatureow;
+  double pressureow; 
+  double humidityow;
 
-  SetWeatherCondition(weatherId, weatherDescription, speed, deg);
+  SetWeatherCondition(weatherId, weatherDescription, speed, deg, temperatureow, pressureow, humidityow);
   if (weatherId > 0) {
     StaticJsonDocument<256> doc;
     // Variable to save current epoch time
@@ -199,6 +207,11 @@ String GetTelemetry() {
     doc["temp"] = t;
     doc["pressure"] = p;
     doc["lux"] = l;
+
+    doc["temperatureow"] = temperatureow;
+    doc["pressureow"] = pressureow;
+    doc["humidityow"] = humidityow;
+
     doc["weathercode"] = weatherId;
     doc["weatherdescr"] = weatherDescription;
 
