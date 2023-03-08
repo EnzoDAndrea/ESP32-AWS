@@ -97,24 +97,27 @@ void OpenWeather(String& openweather) {
   client->stop();
 }
 
-void SetWeatherCondition(int& weatherId, String& weatherDescription, double& speed, double& deg, double& temperatureow, double& pressureow, double& humidityow) {
+void SetWeatherCondition(int& weatherId, String& weatherDescription, double& speed, double& deg, double& temperatureow, int& pressureow, int& humidityow) {
     String currentWeather;
     OpenWeather(currentWeather);
     Serial.println(currentWeather);
-    StaticJsonDocument<200> filter;
+    StaticJsonDocument<512> filter;
 
-    StaticJsonDocument<256> docOpenWeather;
+    StaticJsonDocument<512> docOpenWeather;
     filter["weather"] = true;
     filter["wind"] = true;
     filter["main"] = true;
     deserializeJson(docOpenWeather, currentWeather, DeserializationOption::Filter(filter));
-    weatherId = docOpenWeather["weather"][0]["id"].as<int>();
-    weatherDescription = docOpenWeather["weather"][0]["description"].as<String>();
+    weatherId = docOpenWeather["weather"][0]["id"].as<uint32_t>();
+    const char* description = docOpenWeather["weather"][0]["description"];
+
+    weatherDescription = String(description);
+
     speed = docOpenWeather["wind"]["speed"].as<double>();
-    deg = docOpenWeather["wind"]["deg"].as<double>();
+    deg = (int) docOpenWeather["wind"]["deg"].as<uint32_t>();
     temperatureow = docOpenWeather["main"]["temp"].as<double>();
-    pressureow = docOpenWeather["main"]["pressure"].as<double>();
-    humidityow = docOpenWeather["main"]["humidity"].as<double>();
+    pressureow = (int) docOpenWeather["main"]["pressure"].as<uint32_t>();
+    humidityow = (int) docOpenWeather["main"]["humidity"].as<uint32_t>();
 }
 
 void SetupTelemetry() {
@@ -180,13 +183,13 @@ String GetTelemetry() {
   }
 
   int weatherId = 0;
-  String weatherDescription = "";
+  String  weatherDescription;
 
   double speed = 0.0;
   double deg = 0.0;
   double temperatureow = 0.0;
-  double pressureow = 0.0;
-  double humidityow = 0.0;
+  int pressureow = 0;
+  int humidityow = 0;
 
   SetWeatherCondition(weatherId, weatherDescription, speed, deg, temperatureow, pressureow, humidityow);
   if (weatherId > 0) {
@@ -213,7 +216,7 @@ String GetTelemetry() {
     doc["humidityow"] = humidityow;
 
     doc["weathercode"] = weatherId;
-    doc["weatherdescr"] = weatherDescription;
+    doc["weatherdescr"] = weatherDescription.c_str();
 
     serializeJson(doc, telemetry);
   }
